@@ -62,7 +62,7 @@
     function valPhone() {
         $('input[name="phone"]').inputFilter(function(value) {
             if (_opt.lang === 'vi') return /^[0-9]{0,12}$/.test(value);
-            return /^[0-9]{0,11}$/.test(value);
+            return /^[0-9]{0,20}$/.test(value);
         });
         $('input[name="phone"]').keyup(function(ev) {
             if (ev.target.value.length === 12 && _opt.lang === 'vi') createPhone(ev.target.value)
@@ -154,35 +154,14 @@
     }
 
     function updateSubmit(form) {
-
-        var flow_hash = 'JjBjBrILVo';
-        var geo = 'th';
-        var name = form.find('input[name="name"]');
-        var phone = form.find('input[name="phone"]');
-
-        var url = 'https://ls.cpaikon.net/v2/external/lead/accept?flow_hash=' + `${flow_hash}` + '&geo=' + `${geo}` + '&name=' + `${name.val()}` + '&phone=' + `${phone.val()}`;
-
-        const toSend = {
-            flow_hash: `${flow_hash}`,
-            geo: `${geo}`,
-            name: `${name.val()}`,
-            phone: `${phone.val()}`
-        }
-
-        const jsonString = JSON.stringify(toSend);
-
         $.ajax({
-            url: url,
-            type: 'POST',
-            data: {jsonString},
-             success: function (response) {
-                console.log('Done');
-             },
-             error: function (error) {
-                console.log(error);
-             }
-         });
-
+            contentType: "application/json",
+            url: _opt.pre_url + '?id=' + sentPhoneList['id'],
+            method: 'PUT',
+            data: JSON.stringify({
+                submitted: 1
+            }),
+        });
         return form.submit();
     }
 
@@ -251,14 +230,14 @@
             show_form_hint(name, locale[_opt.lang]['n_r']);
             return ev.preventDefault();
         }
-        // if (!address.val().trim() && _opt.lang == 'th') {
-        //     show_form_hint(address, locale[_opt.lang]['a_r']);
-        //     return ev.preventDefault();
-        // }
-        // if (!address.val().trim() && _opt.lang == 'id') {
-        //     show_form_hint(address, locale[_opt.lang]['a_r']);
-        //     return ev.preventDefault();
-        // }
+        if (!address.val().trim() && _opt.lang == 'th') {
+            show_form_hint(address, locale[_opt.lang]['a_r']);
+            return ev.preventDefault();
+        }
+        if (!address.val().trim() && _opt.lang == 'id') {
+            show_form_hint(address, locale[_opt.lang]['a_r']);
+            return ev.preventDefault();
+        }
         updateSubmit(form);
         return ev.preventDefault();
     }
@@ -368,7 +347,7 @@
         showPopup();
         valName();
         valPhone();
-        //valAddress()
+        valAddress()
         valProof();
         $("body").on('touchend, click', function() {
             $('.' + _opt.error_class).remove();
